@@ -172,6 +172,7 @@ if [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.0" ]]; then
     TOOL_CMAKE="cmake-3.26.1"
     TOOL_GDBM="gdbm-1.18"
     TOOL_LIBFFI="libffi-3.3"
+    TOOL_WHICH="which-2.21"
     
 elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     PATCHES="https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.22-upstream_i386_fix-1.patch"$'\n'"https://web.archive.org/web/20210617235627/http://www.linuxfromscratch.org/patches/lfs/7.8/readline-6.3-upstream_fixes-3.patch"$'\n'"http://lfs.linux-sysadmin.com/patches/downloads/glibc/glibc-2.22-fhs-1.patch"
@@ -326,6 +327,7 @@ TOOL_XPROTO_FILE="${TOOL_XPROTO}.tar.gz"
 TOOL_CMAKE_FILE="${TOOL_CMAKE}.tar.gz"
 TOOL_GDBM_FILE="${TOOL_GDBM}.tar.gz"
 TOOL_LIBFFI_FILE="${TOOL_LIBFFI}.tar.gz"
+TOOL_WHICH_FILE="${TOOL_WHICH}.tar.gz"
 
 # all source directories
 TOOL_SRC_BINUTILS="${NTC_SOURCE}/${TOOL_BINUTILS}"
@@ -390,6 +392,7 @@ TOOL_SRC_XPROTO="${NTC_SOURCE}/${TOOL_XPROTO}"
 TOOL_SRC_CMAKE="${NTC_SOURCE}/${TOOL_CMAKE}"
 TOOL_SRC_GDBM="${NTC_SOURCE}/${TOOL_GDBM}"
 TOOL_SRC_LIBFFI="${NTC_SOURCE}/${TOOL_LIBFFI}"
+TOOL_SRC_WHICH="${NTC_SOURCE}/${TOOL_WHICH}"
 
 
 ######################################################
@@ -463,6 +466,7 @@ https://www.gnupg.org/ftp/gcrypt/gnutls/v${TOOL_GNUTLS_VERSION}/${TOOL_GNUTLS_FI
 https://github.com/Kitware/CMake/releases/download/v${TOOL_CMAKE_VERSION}/${TOOL_CMAKE_FILE}
 https://ftp.gnu.org/gnu/gdbm/${TOOL_GDBM_FILE}
 https://github.com/libffi/libffi/releases/download/v${TOOL_LIBFFI_VERSION}/${TOOL_LIBFFI_FILE}
+https://ftp.gnu.org/gnu/which/${TOOL_WHICH_FILE}
 $PATCHES
 EOF
 
@@ -2205,6 +2209,8 @@ CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
 make ${NTC_MAKE_FLAGS} &&
 make ${NTC_MAKE_FLAGS} install || exit 1
 
+ln -sv python3 ${NTC}/usr/bin/python
+
 
 ######################################################
 # 5.11 X11
@@ -3044,4 +3050,25 @@ cd "${TOOL_SRC_CMAKE}/build"        &&
 # make and install the tool
 make ${NTC_MAKE_FLAGS} &&
 make ${NTC_MAKE_FLAGS} install || exit 1
+
+
+######################################################
+# 5.40 INSTALL WHICH
+######################################################
+
+printf "\n\n\n\n\n... 5.40 - Installing WHICH\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_WHICH}"
+untar "${NTC_SOURCE}/${TOOL_WHICH_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_WHICH}/build" &&
+cd "${TOOL_SRC_WHICH}/build"        &&
+"${TOOL_SRC_WHICH}/configure"        \
+    --prefix="${NTC}/usr"           &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
 
