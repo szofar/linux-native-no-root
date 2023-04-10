@@ -14,6 +14,11 @@
 # TODO: version 1.1 tool list is a dummy placeholder
 # TODO: 4.0 CREATE DIRECTORIES - Probably don't need this for native
 # TODO: git clone https://github.com/vim/vim.git
+# TODO: usr tools like zlib to NTC/usr/local
+# TODO: patches per version
+# TODO: STD_STARTFILE_PREFIX_1 ignored for "cross" compilers!
+#       even though this is technically native
+# TODO: md5 sums
 #
 ######################################################################
 
@@ -253,7 +258,10 @@ TOOL_TCL_LIB_VERSION="lib$(echo ${TOOL_TCL} | sed 's/\.[0-9]*$//')"
 TOOL_TK_LIB_VERSION="lib$(echo ${TOOL_TK} | sed 's/\.[0-9]*$//')"
 TOOL_BZIP2_VERSION="$(echo ${TOOL_BZIP2} | cut -d'-' -f 2)"
 TOOL_BZIP2_MINOR_VERSION="$(echo ${TOOL_BZIP2} | cut -d'-' -f 2 | sed 's/\.[0-9]*$//')"
+TOOL_BZIP2_MAJOR_VERSION="$(echo ${TOOL_BZIP2} | cut -d'.' -f 1 | cut -d'-' -f 2 )"
 TOOL_LIBFFI_VERSION="$(echo ${TOOL_LIBFFI} | cut -d'-' -f 2)"
+TOOL_NCURSES_VERSION="$(echo ${TOOL_NCURSES} | cut -d'-' -f 2 )"
+TOOL_NCURSES_MAJOR_VERSION="$(echo ${TOOL_NCURSES} | cut -d'.' -f 1 | cut -d'-' -f 2 )"
 
 # tool with extension
 TOOL_BINUTILS_FILE="${TOOL_BINUTILS}.tar.bz2"
@@ -497,7 +505,7 @@ untar () {
 # wget the sources
 wget -nc -i "${NTC_SOURCE}/sources.txt" --directory-prefix "${NTC_SOURCE}" ${wget_opts}
 
-# TODO
+# md5 stuff
 # pushd ${NTC_SOURCE}
 # md5sum -c md5sums || exit 1
 # popd
@@ -565,7 +573,6 @@ for file in $(find gcc/config -name linux64.h.orig -o -name linux.h.orig -o -nam
 done
 
 # avoid existing root, using LFS example code
-# TODO NOTE: STD_STARTFILE_PREFIX_1 ignored for cross compilers! (though this technically=native)
 for file in $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h); do
     cp -uv $file{,.orig}
     sed -e 's@/lib\(64\)\?\(32\)\?/ld@'"${NTC_TOOLS}"'&@g' \
@@ -646,7 +653,6 @@ rm -rf "${TOOL_SRC_GLIBC}"
 untar "${NTC_SOURCE}/${TOOL_GLIBC_FILE}"
 
 # apply patch
-# TODO patches per version
 cd "${TOOL_SRC_GLIBC}"
 patch -Np1 -i ../glibc-2.22-upstream_i386_fix-1.patch
 
@@ -2129,10 +2135,9 @@ cd "${TOOL_SRC_NCURSES}/build"        &&
 make "${NTC_MAKE_FLAGS}" &&
 
 # avoid a crash
-# TODO hardcoded?
 make DESTDIR=${PWD}/dest install || exit 1
-install -vm755 dest/${NTC}/usr/lib/libncursesw.so.6.0 ${NTC}/usr/lib
-rm -v  dest/${NTC}/usr/lib/libncursesw.so.6.0
+install -vm755 dest/${NTC}/usr/lib/libncursesw.so.${TOOL_NCURSES_VERSION} ${NTC}/usr/lib
+rm -v  dest/${NTC}/usr/lib/libncursesw.so.${TOOL_NCURSES_VERSION}
 cp -av dest/${NTC}/* ${NTC}/
 
 # apps expecting non-widec
@@ -2459,7 +2464,9 @@ cd "${TOOL_SRC_BZIP2}"             &&
 make -f Makefile-libbz2_so         &&
 make install PREFIX=${NTC}/usr/    &&
 cp libbz2.so.${TOOL_BZIP2_VERSION} ${NTC}/usr/lib/ &&
-ln -vs libbz2.so.${TOOL_BZIP2_VERSION} ${NTC}/usr/lib/libbz2.so.${TOOL_BZIP2_MINOR_VERSION} || exit 1
+ln -vs libbz2.so.${TOOL_BZIP2_VERSION} ${NTC}/usr/lib/libbz2.so.${TOOL_BZIP2_MINOR_VERSION} &&
+ln -vs libbz2.so.${TOOL_BZIP2_MINOR_VERSION} ${NTC}/usr/lib/libbz2.so
+ln -vs libbz2.so.${TOOL_BZIP2_MINOR_VERSION} ${NTC}/usr/lib/libbz2.so.1 || exit 1
 
 
 ######################################################
@@ -3011,18 +3018,28 @@ printf "Removing existing source directory if it exists...\n"
 rm -rf "${TOOL_SRC_CMAKE}"
 untar "${NTC_SOURCE}/${TOOL_CMAKE_FILE}"
 
+cd "${TOOL_SRC_CMAKE}"
+sed -i '/"lib64"/s/64//' Modules/GNUInstallDirs.cmake
+
 # configure the build
 rm -rf "${TOOL_SRC_CMAKE}/build"    &&
 mkdir -vp "${TOOL_SRC_CMAKE}/build" &&
 cd "${TOOL_SRC_CMAKE}/build"        &&
-LDFLAGS="-L${NTC}/usr/lib"           \
-CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
-CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
-"${TOOL_SRC_CMAKE}/configure"        \
-    --prefix=${NTC}/usr              \
-    --system-zlib                    \
-    --system-expat                   \
-    --system-bzip2                  &&
+"${TOOL_SRC_CMAKE}/configure"                          \
+    --prefix=${NTC}/usr                                \
+    --mandir=${NTC}/usr/share/man                      \
+    --verbose                                          \
+    --system-zlib                                      \
+    --system-expat                                     \
+    --system-bzip2                                     \
+    --parallel=36                                      \
+    --docdir=${NTC}/usr/share/doc/${TOOL_CMAKE}        \
+    -- -DBUILD_CursesDialog=ON                         \
+    -DZLIB_LIBRARY=${NTC}/usr/lib/libz.so              \
+    -DBZIP2_LIBRARY=${NTC}/usr/lib/libbz2.so           \
+    -DEXPAT_LIBRARY=${NTC}/usr/lib/libexpat.so         \
+    -DCURSES_LIBRARY=${NTC}/usr/lib/libncursesw.so.${TOOL_NCURSES_MAJOR_VERSION} \
+    -DCURSES_INCLUDE_PATH=${NTC}/usr/include/ncursesw &&
 
 # make and install the tool
 make ${NTC_MAKE_FLAGS} &&
