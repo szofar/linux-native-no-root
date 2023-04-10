@@ -9,16 +9,11 @@
 #  Make changes as you go if necessary. This is not a
 #  comprehensive guide like LFS. Merely a specific use case/example.
 #
-# TODO: I could probably avoid passes 1 and 2 of binutils/gcc.
+# TODO: I could probably avoid pass 2 of binutils/gcc.
 # TODO: tzdata hard coded
 # TODO: version 1.1 tool list is a dummy placeholder
-# TODO: ncurses configure picks up the wrong host maybe (.6.so v .5)
-# TODO: python == ncursesw, curses.h, bzlib.h, ffi.h
-#         _gdbm                 _lzma                 _sqlite3
-#         _uuid
-#         _bz2                  _ctypes               _curses
-#         _curses_panel         _dbm
 # TODO: 4.0 CREATE DIRECTORIES - Probably don't need this for native
+# TODO: git clone https://github.com/vim/vim.git
 #
 ######################################################################
 
@@ -66,7 +61,7 @@ printf "\n\n\n\n\n... 0.1 - Environment\n"
 export LC_ALL=POSIX
 
 # set path with preference to NTC/usr over NTC_TOOLS over original PATH
-PATH=${NTC}/usr/bin:${NTC}/usr/sbin:${NTC_TOOLS}/bin:${NTC_TOOLS}/sbin:${PATH}
+export PATH=${NTC}/usr/bin:${NTC}/usr/sbin:${NTC_TOOLS}/bin:${NTC_TOOLS}/sbin:${PATH}
 
 # set permissions
 umask 022
@@ -170,6 +165,8 @@ if [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.0" ]]; then
     TOOL_XAU="libXau-1.0.9"
     TOOL_XPROTO="xproto-7.0.31"
     TOOL_CMAKE="cmake-3.26.1"
+    TOOL_GDBM="gdbm-1.18"
+    TOOL_LIBFFI="libffi-3.3"
     
 elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     PATCHES="https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.22-upstream_i386_fix-1.patch"$'\n'"https://web.archive.org/web/20210617235627/http://www.linuxfromscratch.org/patches/lfs/7.8/readline-6.3-upstream_fixes-3.patch"$'\n'"http://lfs.linux-sysadmin.com/patches/downloads/glibc/glibc-2.22-fhs-1.patch"
@@ -234,6 +231,8 @@ elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     TOOL_XAU="libXau-1.0.9"
     TOOL_XPROTO="xproto-7.0.31"
     TOOL_CMAKE="cmake-3.26.1"
+    TOOL_GDBM="gdbm-1.18"
+    TOOL_LIBFFI="libffi-3.3"
 fi;
 
 # we need the version for some downloads
@@ -252,6 +251,9 @@ TOOL_CMAKE_VERSION="$(echo ${TOOL_CMAKE} | cut -d'-' -f 2)"
 TOOL_TCL_VERSION="$(echo ${TOOL_TCL} | sed 's/^tcl//')"
 TOOL_TCL_LIB_VERSION="lib$(echo ${TOOL_TCL} | sed 's/\.[0-9]*$//')"
 TOOL_TK_LIB_VERSION="lib$(echo ${TOOL_TK} | sed 's/\.[0-9]*$//')"
+TOOL_BZIP2_VERSION="$(echo ${TOOL_BZIP2} | cut -d'-' -f 2)"
+TOOL_BZIP2_MINOR_VERSION="$(echo ${TOOL_BZIP2} | cut -d'-' -f 2 | sed 's/\.[0-9]*$//')"
+TOOL_LIBFFI_VERSION="$(echo ${TOOL_LIBFFI} | cut -d'-' -f 2)"
 
 # tool with extension
 TOOL_BINUTILS_FILE="${TOOL_BINUTILS}.tar.bz2"
@@ -314,6 +316,8 @@ TOOL_LIB_PTHREAD_FILE="${TOOL_LIB_PTHREAD}.tar.gz"
 TOOL_XAU_FILE="${TOOL_XAU}.tar.gz"
 TOOL_XPROTO_FILE="${TOOL_XPROTO}.tar.gz"
 TOOL_CMAKE_FILE="${TOOL_CMAKE}.tar.gz"
+TOOL_GDBM_FILE="${TOOL_GDBM}.tar.gz"
+TOOL_LIBFFI_FILE="${TOOL_LIBFFI}.tar.gz"
 
 # all source directories
 TOOL_SRC_BINUTILS="${NTC_SOURCE}/${TOOL_BINUTILS}"
@@ -376,6 +380,8 @@ TOOL_SRC_LIB_PTHREAD="${NTC_SOURCE}/${TOOL_LIB_PTHREAD}"
 TOOL_SRC_XAU="${NTC_SOURCE}/${TOOL_XAU}"
 TOOL_SRC_XPROTO="${NTC_SOURCE}/${TOOL_XPROTO}"
 TOOL_SRC_CMAKE="${NTC_SOURCE}/${TOOL_CMAKE}"
+TOOL_SRC_GDBM="${NTC_SOURCE}/${TOOL_GDBM}"
+TOOL_SRC_LIBFFI="${NTC_SOURCE}/${TOOL_LIBFFI}"
 
 
 ######################################################
@@ -447,6 +453,8 @@ https://www.python.org/ftp/python/${TOOL_PYTHON_VERSION}/${TOOL_PYTHON_FILE}
 https://github.com/libexpat/libexpat/releases/download/${TOOL_EXPAT_VERSION}/${TOOL_EXPAT_FILE}
 https://www.gnupg.org/ftp/gcrypt/gnutls/v${TOOL_GNUTLS_VERSION}/${TOOL_GNUTLS_FILE}
 https://github.com/Kitware/CMake/releases/download/v${TOOL_CMAKE_VERSION}/${TOOL_CMAKE_FILE}
+https://ftp.gnu.org/gnu/gdbm/${TOOL_GDBM_FILE}
+https://github.com/libffi/libffi/releases/download/v${TOOL_LIBFFI_VERSION}/${TOOL_LIBFFI_FILE}
 $PATCHES
 EOF
 
@@ -890,7 +898,7 @@ cd "${TOOL_SRC_EXPECT}/build"                &&
     --with-tcl="${NTC_TOOLS}/lib"             \
     --with-tclinclude="${NTC_TOOLS}/include" &&
 
-make "${NTC_MAKE_FLAGS}"
+make "${NTC_MAKE_FLAGS}" &&
 # TZ=UTC make "${NTC_MAKE_FLAGS}" test
 make "${NTC_MAKE_FLAGS}" install || exit 1
 
@@ -1925,7 +1933,7 @@ cd "${TOOL_SRC_PKG_CONFIG}/build"        &&
     --prefix=${NTC}/usr                   \
     --with-internal-glib                  \
     --disable-host-tool                   \
-    --docdir=$NTC/usr/share/doc/${TOOL_PKG_CONFIG} &&
+    --docdir=${NTC}/usr/share/doc/${TOOL_PKG_CONFIG} &&
 
 # make and install the tool
 make ${NTC_MAKE_FLAGS} &&
@@ -2104,23 +2112,39 @@ untar "${NTC_SOURCE}/${TOOL_NCURSES_FILE}"
 cd "${TOOL_SRC_NCURSES}"
 sed -i s/mawk// configure
 
-# fix for 32bit toolchain sanity...
-ln -s libncursesw.so ${NTC}/usr/lib/libncurses.so.5
-ln -s libncursesw.a ${NTC}/usr/lib/libncurses.a
-ln -s libncurses++w.a ${NTC}/usr/lib/libncurses++.a
-
 # configure the build
 mkdir -vp "${TOOL_SRC_NCURSES}/build" &&
 cd "${TOOL_SRC_NCURSES}/build"        &&
 "${TOOL_SRC_NCURSES}/configure"        \
     --prefix="${NTC}/usr"              \
+    --mandir="${NTC}/usr/share/man"    \
     --with-shared                      \
+    --with-cxx-shared                  \
+    --without-normal                   \
     --without-debug                    \
+    --enable-pc-files                  \
     --enable-widec                     \
-    --enable-overwrite                &&
+    --with-pkg-config-libdir="${NTC}/usr/lib/pkgconfig" &&
 
 make "${NTC_MAKE_FLAGS}" &&
-make "${NTC_MAKE_FLAGS}" install || exit 1
+
+# avoid a crash
+# TODO hardcoded?
+make DESTDIR=${PWD}/dest install || exit 1
+install -vm755 dest/${NTC}/usr/lib/libncursesw.so.6.0 ${NTC}/usr/lib
+rm -v  dest/${NTC}/usr/lib/libncursesw.so.6.0
+cp -av dest/${NTC}/* ${NTC}/
+
+# apps expecting non-widec
+for lib in ncurses form panel menu ; do
+    rm -vf                    ${NTC}/usr/lib/lib${lib}.so
+    echo "INPUT(-l${lib}w)" > ${NTC}/usr/lib/lib${lib}.so
+    ln -sfv ${lib}w.pc        ${NTC}/usr/lib/pkgconfig/${lib}.pc
+done
+
+rm -vf                     ${NTC}/usr/lib/libcursesw.so
+echo "INPUT(-lncursesw)" > ${NTC}/usr/lib/libcursesw.so
+ln -sfv libncurses.so      ${NTC}/usr/lib/libcurses.so
 
 
 ######################################################
@@ -2165,6 +2189,9 @@ untar "${NTC_SOURCE}/${TOOL_PYTHON_FILE}"
 rm -rf "${TOOL_SRC_PYTHON}/build"    &&
 mkdir -vp "${TOOL_SRC_PYTHON}/build" &&
 cd "${TOOL_SRC_PYTHON}/build"        &&
+LDFLAGS="-L${NTC}/usr/lib"           \
+CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
+CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
 "${TOOL_SRC_PYTHON}/configure"        \
     --prefix=${NTC}/usr               \
     --with-openssl=${NTC}/usr        &&
@@ -2423,12 +2450,529 @@ cd "${TOOL_SRC_BZIP2}"   &&
 make "${NTC_MAKE_FLAGS}" &&
 make "${NTC_MAKE_FLAGS}" PREFIX="${NTC}/usr" install || exit 1
 
+# redo for library
+rm -rf "${TOOL_SRC_BZIP2}"
+untar "${NTC_SOURCE}/${TOOL_BZIP2_FILE}"
+
+# configure the build
+cd "${TOOL_SRC_BZIP2}"             &&
+make -f Makefile-libbz2_so         &&
+make install PREFIX=${NTC}/usr/    &&
+cp libbz2.so.${TOOL_BZIP2_VERSION} ${NTC}/usr/lib/ &&
+ln -vs libbz2.so.${TOOL_BZIP2_VERSION} ${NTC}/usr/lib/libbz2.so.${TOOL_BZIP2_MINOR_VERSION} || exit 1
+
 
 ######################################################
-# 5.15 Python - Pass 2
+# 5.15 INSTALL GDBM
 ######################################################
 
-printf "\n\n\n\n\n... 5.15 - Installing Python - Pass 2\n\n"
+printf "\n\n\n\n\n... 5.15 - Installing GDBM\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_GDBM}"
+untar "${NTC_SOURCE}/${TOOL_GDBM_FILE}"
+
+# configure the build
+rm -rf "${TOOL_SRC_GDBM}/build"    &&
+mkdir -vp "${TOOL_SRC_GDBM}/build" &&
+cd "${TOOL_SRC_GDBM}/build"        &&
+"${TOOL_SRC_GDBM}/configure"        \
+    --prefix=${NTC}/usr             \
+    --disable-static                \
+    --enable-libgdbm-compat        &&
+
+make ${NTC_MAKE_FLAGS} &&
+make ${NTC_MAKE_FLAGS} install || exit 1
+
+
+######################################################
+# 5.16 INSTALL LIBFFI
+######################################################
+
+printf "\n\n\n\n\n... 5.16 - Installing LIBFFI\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_LIBFFI}"
+untar "${NTC_SOURCE}/${TOOL_LIBFFI_FILE}"
+
+# configure the build
+rm -rf "${TOOL_SRC_LIBFFI}/build"    &&
+mkdir -vp "${TOOL_SRC_LIBFFI}/build" &&
+cd "${TOOL_SRC_LIBFFI}/build"        &&
+"${TOOL_SRC_LIBFFI}/configure"        \
+    --prefix=${NTC}/usr              &&
+
+make ${NTC_MAKE_FLAGS} &&
+make ${NTC_MAKE_FLAGS} install || exit 1
+
+
+######################################################
+# 5.17 INSTALL EXPECT
+######################################################
+
+printf "\n\n\n\n\n... 5.17 - Installing Expect\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_EXPECT}"
+untar "${NTC_SOURCE}/${TOOL_EXPECT_FILE}"
+
+cd "${TOOL_SRC_EXPECT}"
+cp -v configure{,.orig}
+sed "s:/usr/local/bin:${NTC}/usr/bin:" configure.orig > configure
+
+# configure the build
+mkdir -vp "${TOOL_SRC_EXPECT}/build"       &&
+cd "${TOOL_SRC_EXPECT}/build"              &&
+"${TOOL_SRC_EXPECT}/configure"              \
+    --prefix="${NTC}/usr"                   \
+    --with-tcl="${NTC}/usr/lib"             \
+    --with-tclinclude="${NTC}/usr/include" &&
+
+make "${NTC_MAKE_FLAGS}" &&
+# TZ=UTC make "${NTC_MAKE_FLAGS}" test
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.18 INSTALL DEJAGNU
+######################################################
+
+printf "\n\n\n\n\n... 5.18 - Installing DejaGNU\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_DEJAGNU}"
+untar "${NTC_SOURCE}/${TOOL_DEJAGNU_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_DEJAGNU}/build" &&
+cd "${TOOL_SRC_DEJAGNU}/build"        &&
+"${TOOL_SRC_DEJAGNU}/configure"        \
+    --prefix="${NTC}/usr"             &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.19 INSTALL CHECK
+######################################################
+
+printf "\n\n\n\n\n... 5.19 - Installing Check\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_CHECK}"
+untar "${NTC_SOURCE}/${TOOL_CHECK_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_CHECK}/build" &&
+cd "${TOOL_SRC_CHECK}/build"        &&
+PKG_CONFIG=""                        \
+"${TOOL_SRC_CHECK}/configure"        \
+    --prefix="${NTC}/usr"           &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.20 INSTALL BASH
+######################################################
+printf "\n\n\n\n\n... 5.20 - Installing Bash\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_BASH}"
+untar "${NTC_SOURCE}/${TOOL_BASH_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_BASH}/build" &&
+cd "${TOOL_SRC_BASH}/build"        &&
+"${TOOL_SRC_BASH}/configure"        \
+    --prefix="${NTC}/usr"           \
+    --without-bash-malloc          &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install &&
+
+ln -sv bash "${NTC}/usr/bin/sh" || exit 1
+
+
+######################################################
+# 5.21 INSTALL COREUTILS
+######################################################
+
+printf "\n\n\n\n\n... 5.21 - Installing Coreutils\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_COREUTILS}"
+untar "${NTC_SOURCE}/${TOOL_COREUTILS_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_COREUTILS}/build" &&
+cd "${TOOL_SRC_COREUTILS}/build"        &&
+"${TOOL_SRC_COREUTILS}/configure"        \
+    --prefix="${NTC}/usr"                \
+    --enable-install-program=hostname   &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.22 INSTALL DIFFUTILS
+######################################################
+
+printf "\n\n\n\n\n... 5.22 - Installing Diffutils\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_DIFFUTILS}"
+untar "${NTC_SOURCE}/${TOOL_DIFFUTILS_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_DIFFUTILS}/build" &&
+cd "${TOOL_SRC_DIFFUTILS}/build"        &&
+"${TOOL_SRC_DIFFUTILS}/configure"        \
+    --prefix="${NTC}/usr"               &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.23 INSTALL FINDUTILS
+######################################################
+
+printf "\n\n\n\n\n... 5.23 - Installing Findutils\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_FINDUTILS}"
+untar "${NTC_SOURCE}/${TOOL_FINDUTILS_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_FINDUTILS}/build" &&
+cd "${TOOL_SRC_FINDUTILS}/build"        &&
+"${TOOL_SRC_FINDUTILS}/configure"        \
+    --prefix="${NTC}/usr"               &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.24 INSTALL GAWK
+######################################################
+
+printf "\n\n\n\n\n... 5.24 - Installing Gawk\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_GAWK}"
+untar "${NTC_SOURCE}/${TOOL_GAWK_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_GAWK}/build" &&
+cd "${TOOL_SRC_GAWK}/build"        &&
+"${TOOL_SRC_GAWK}/configure"        \
+    --prefix="${NTC}/usr"          &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.25 INSTALL GETTEXT
+######################################################
+
+printf "\n\n\n\n\n... 5.25 - Installing Gettext\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_GETTEXT}"
+untar "${NTC_SOURCE}/${TOOL_GETTEXT_FILE}"
+
+# configure the build
+cd "${TOOL_SRC_GETTEXT}"       &&
+EMACS="no"                      \
+"${TOOL_SRC_GETTEXT}/configure" \
+    --prefix="${NTC}/usr"      &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.26 INSTALL GREP
+######################################################
+
+printf "\n\n\n\n\n... 5.26 - Installing Grep\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_GREP}"
+untar "${NTC_SOURCE}/${TOOL_GREP_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_GREP}/build" &&
+cd "${TOOL_SRC_GREP}/build"        &&
+"${TOOL_SRC_GREP}/configure"        \
+    --prefix="${NTC}/usr"          &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.27 INSTALL GZIP
+######################################################
+
+printf "\n\n\n\n\n... 5.27 - Installing Gzip\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_GZIP}"
+untar "${NTC_SOURCE}/${TOOL_GZIP_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_GZIP}/build" &&
+cd "${TOOL_SRC_GZIP}/build"        &&
+"${TOOL_SRC_GZIP}/configure"        \
+    --prefix="${NTC}/usr"          &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.28 INSTALL M4
+######################################################
+
+printf "\n\n\n\n\n... 5.28 - Installing M4\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_M4}"
+untar "${NTC_SOURCE}/${TOOL_M4_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_M4}/build" &&
+cd "${TOOL_SRC_M4}/build"        &&
+"${TOOL_SRC_M4}/configure"        \
+    --prefix="${NTC}/usr"        &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.29 INSTALL MAKE
+######################################################
+
+printf "\n\n\n\n\n... 5.29 - Installing Make\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_MAKE}"
+untar "${NTC_SOURCE}/${TOOL_MAKE_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_MAKE}/build" &&
+cd "${TOOL_SRC_MAKE}/build"        &&
+"${TOOL_SRC_MAKE}/configure"        \
+    --prefix="${NTC}/usr"           \
+    --without-guile                &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.30 INSTALL PATCH
+######################################################
+
+printf "\n\n\n\n\n... 5.30 - Installing Patch\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_PATCH}"
+untar "${NTC_SOURCE}/${TOOL_PATCH_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_PATCH}/build" &&
+cd "${TOOL_SRC_PATCH}/build"        &&
+"${TOOL_SRC_PATCH}/configure"        \
+    --prefix="${NTC}/usr"           &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.31 INSTALL SED
+######################################################
+
+printf "\n\n\n\n\n... 5.31 - Installing Sed\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_SED}"
+untar "${NTC_SOURCE}/${TOOL_SED_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_SED}/build" &&
+cd "${TOOL_SRC_SED}/build"        &&
+"${TOOL_SRC_SED}/configure"        \
+    --prefix="${NTC}/usr"         &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.32 PERL
+######################################################
+
+printf "\n\n\n\n\n... 5.32 - Installing PERL\n\n"
+
+rm -rf "${TOOL_SRC_PERL}"
+untar "${NTC_SOURCE}/${TOOL_PERL_FILE}"
+
+# configure the build
+cd "${TOOL_SRC_PERL}" &&
+sh Configure -des -Dprefix=${NTC}/usr -Dlibs=-lm &&
+
+# make and install the tool
+make ${NTC_MAKE_FLAGS} &&
+cp -v perl cpan/podlators/pod2man ${NTC}/usr/bin &&
+mkdir -pv ${NTC}/usr/lib/perl${TOOL_PERL_MAJOR}/${TOOL_PERL_VERSION} &&
+cp -Rv lib/* ${NTC}/usr/lib/perl${TOOL_PERL_MAJOR}/${TOOL_PERL_VERSION} || exit 1
+
+
+######################################################
+# 5.33 TEXINFO
+######################################################
+
+printf "\n\n\n\n\n... 5.33 - Installing Texinfo\n\n"
+
+rm -rf "${TOOL_SRC_TEXINFO}"
+untar "${NTC_SOURCE}/${TOOL_TEXINFO_FILE}"
+
+# configure the build
+rm -rf "${TOOL_SRC_TEXINFO}/build"    &&
+mkdir -vp "${TOOL_SRC_TEXINFO}/build" &&
+cd "${TOOL_SRC_TEXINFO}/build"        &&
+"${TOOL_SRC_TEXINFO}/configure"        \
+    --prefix="${NTC}/usr"             &&
+
+# make and install the tool
+make ${NTC_MAKE_FLAGS} &&
+make ${NTC_MAKE_FLAGS} install || exit 1
+
+
+######################################################
+# 5.34 INSTALL TAR
+######################################################
+
+printf "\n\n\n\n\n... 5.34 - Installing Tar\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_TAR}"
+untar "${NTC_SOURCE}/${TOOL_TAR_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_TAR}/build" &&
+cd "${TOOL_SRC_TAR}/build"        &&
+"${TOOL_SRC_TAR}/configure"        \
+    --prefix="${NTC}/usr"         &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.35 INSTALL READLINE 
+######################################################
+
+printf "\n\n\n\n\n... 5.35 - Installing Readline\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_READLINE}"
+untar "${NTC_SOURCE}/${TOOL_READLINE_FILE}"
+
+# patch
+cd "${TOOL_SRC_READLINE}"
+patch -Np1 -i ../readline-6.3-upstream_fixes-3.patch
+
+# configure the build
+mkdir -vp "${TOOL_SRC_READLINE}/build"          &&
+cd "${TOOL_SRC_READLINE}/build"                 &&
+"${TOOL_SRC_READLINE}/configure"                 \
+    --prefix="${NTC}/usr"                        \
+    --docdir=${NTC}/usr/share/doc/readline-6.3   \
+    --disable-static                            &&
+
+make "${NTC_MAKE_FLAGS}" SHLIB_LIBS=-lncursesw &&
+make "${NTC_MAKE_FLAGS}" SHLIB_LIBS=-lncursesw install || exit 1
+
+
+######################################################
+# 5.36 INSTALL UTIL-LINUX
+######################################################
+
+printf "\n\n\n\n\n... 5.36 - Installing Util-linux\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_UTIL_LINUX}"
+untar "${NTC_SOURCE}/${TOOL_UTIL_LINUX_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_UTIL_LINUX}/build" &&
+cd "${TOOL_SRC_UTIL_LINUX}/build"        &&
+"${TOOL_SRC_UTIL_LINUX}/configure"        \
+    --prefix="${NTC}/usr"                 \
+    --disable-makeinstall-chown           \
+    --without-systemdsystemunitdir       &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.37 INSTALL XZ
+######################################################
+
+printf "\n\n\n\n\n... 5.37 - Installing XZ\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_XZ}"
+untar "${NTC_SOURCE}/${TOOL_XZ_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_XZ}/build" &&
+cd "${TOOL_SRC_XZ}/build"        &&
+"${TOOL_SRC_XZ}/configure"        \
+    --prefix="${NTC}/usr"        &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.38 Python - Pass 2
+######################################################
+
+printf "\n\n\n\n\n... 5.38 - Installing Python - Pass 2\n\n"
 
 # remove existing
 printf "Removing existing source directory if it exists...\n"
@@ -2436,12 +2980,18 @@ rm -rf "${TOOL_SRC_PYTHON}"
 untar "${NTC_SOURCE}/${TOOL_PYTHON_FILE}"
 
 # configure the build
-rm -rf "${TOOL_SRC_PYTHON}/build"               &&
-mkdir -vp "${TOOL_SRC_PYTHON}/build"            &&
-cd "${TOOL_SRC_PYTHON}/build"                   &&
+rm -rf "${TOOL_SRC_PYTHON}/build"    &&
+mkdir -vp "${TOOL_SRC_PYTHON}/build" &&
+cd "${TOOL_SRC_PYTHON}/build"        &&
+LDFLAGS="-L${NTC}/usr/lib"           \
+CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
+CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
 "${TOOL_SRC_PYTHON}/configure"                   \
     --prefix=${NTC}/usr                          \
     --with-openssl=${NTC}/usr/                   \
+    --with-dbmliborder=gdbm:ndbm:bdb             \
+    --with-system-ffi                            \
+    --with-tzpath=${NTC}/usr/share/zoneinfo      \
     --with-tcltk-includes="-I${NTC}/usr/include" \
     --with-tcltk-libs="${NTC}/usr/lib/${TOOL_TCL_LIB_VERSION}.so ${NTC}/usr/lib/${TOOL_TK_LIB_VERSION}.so" &&
 
@@ -2451,10 +3001,10 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 
 ######################################################
-# 5.16 Cmake
+# 5.39 Cmake
 ######################################################
 
-printf "\n\n\n\n\n... 5.16 - Installing Cmake\n\n"
+printf "\n\n\n\n\n... 5.39 - Installing Cmake\n\n"
 
 # remove existing
 printf "Removing existing source directory if it exists...\n"
@@ -2465,6 +3015,9 @@ untar "${NTC_SOURCE}/${TOOL_CMAKE_FILE}"
 rm -rf "${TOOL_SRC_CMAKE}/build"    &&
 mkdir -vp "${TOOL_SRC_CMAKE}/build" &&
 cd "${TOOL_SRC_CMAKE}/build"        &&
+LDFLAGS="-L${NTC}/usr/lib"           \
+CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
+CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
 "${TOOL_SRC_CMAKE}/configure"        \
     --prefix=${NTC}/usr              \
     --system-zlib                    \
@@ -2474,23 +3027,4 @@ cd "${TOOL_SRC_CMAKE}/build"        &&
 # make and install the tool
 make ${NTC_MAKE_FLAGS} &&
 make ${NTC_MAKE_FLAGS} install || exit 1
-
-
-
-######################################################
-# DEBUG NOTES:
-
-# critical edit to the linker path
-# cp -uv ${NTC_TOOLS}/lib/libc.so{,.orig}
-# cp -uv ${NTC_TOOLS}/lib/libm.so{,.orig}
-# sed -e 's@'"${NTC}"'@/@g' ${NTC_TOOLS}/lib/libc.so.orig > ${NTC_TOOLS}/lib/libc.so
-# sed -e 's@'"${NTC}"'@/@g' ${NTC_TOOLS}/lib/libm.so.orig > ${NTC_TOOLS}/lib/libm.so
-# diff ${NTC_TOOLS}/lib/libc.so{,.orig}
-# diff ${NTC_TOOLS}/lib/libm.so{,.orig}
-
-# ${NTC_NAME}-gcc -dumpspecs | sed -e "s@crt[1in].o@${NTC_TOOLS}/lib/&@g" > ${NTC_TOOLS}/lib/gcc/${NTC_NAME}/${TOOL_GCC_VERSION}/specs
-
-# with-gxx-include-dir relative to DESTDIR? yes!
-
-######################################################
 
