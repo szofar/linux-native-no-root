@@ -1782,7 +1782,7 @@ cd "${TOOL_SRC_MPFR}/build"                    &&
 make ${NTC_MAKE_FLAGS} &&
 make ${NTC_MAKE_FLAGS} html &&
 make ${NTC_MAKE_FLAGS} install &&
-make ${NTC_MAKE_FLAGS} install-html && || exit 1
+make ${NTC_MAKE_FLAGS} install-html || exit 1
 
 
 ######################################################
@@ -1809,7 +1809,7 @@ cd "${TOOL_SRC_MPC}/build"                    &&
 make ${NTC_MAKE_FLAGS} &&
 make ${NTC_MAKE_FLAGS} html &&
 make ${NTC_MAKE_FLAGS} install &&
-make ${NTC_MAKE_FLAGS} install-html && || exit 1
+make ${NTC_MAKE_FLAGS} install-html || exit 1
 
 
 ######################################################
@@ -2023,10 +2023,10 @@ rm -rf "${TOOL_SRC_UNBOUND}"
 untar "${NTC_SOURCE}/${TOOL_UNBOUND_FILE}"
 
 # configure the build
-cd "${TOOL_SRC_UNBOUND}"        &&
-"${TOOL_SRC_UNBOUND}/configure"  \
-    --prefix=${NTC}/usr          \
-    --with-ssl=${NTC}/usr/       \
+cd "${TOOL_SRC_UNBOUND}"                            &&
+"${TOOL_SRC_UNBOUND}/configure"                      \
+    --prefix=${NTC}/usr                              \
+    --with-ssl=${NTC}/usr/                           \
     --with-rootkey-file=${NTC}/etc/unbound/root.key &&
 
 # make and install the tool
