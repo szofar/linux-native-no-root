@@ -507,7 +507,7 @@ untar () {
 }
 
 # wget the sources
-wget -nc -i "${NTC_SOURCE}/sources.txt" --directory-prefix "${NTC_SOURCE}" ${wget_opts}
+wget --tries 5 --retry-connrefused -nc -i "${NTC_SOURCE}/sources.txt" --directory-prefix "${NTC_SOURCE}" ${wget_opts} || (echo "wget failed" && exit 1)
 
 # md5 stuff
 # pushd ${NTC_SOURCE}
