@@ -3072,3 +3072,120 @@ cd "${TOOL_SRC_WHICH}/build"        &&
 make "${NTC_MAKE_FLAGS}" &&
 make "${NTC_MAKE_FLAGS}" install || exit 1
 
+
+# autoconf
+https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz
+
+# zip
+https://downloads.sourceforge.net/infozip/zip30.tar.gz
+make -f unix/Makefile generic_gcc
+make prefix=/p/pde/tvpv/tools/ntc/usr MANDIR=/p/pde/tvpv/tools/ntc/usr/share/man/man1 -f unix/Makefile install
+
+# unzip
+https://sourceforge.net/projects/infozip/files/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz
+https://www.linuxfromscratch.org/patches/blfs/svn/unzip-6.0-consolidated_fixes-1.patch
+tar -zxf unzip60.tar.gz
+patch -Np1 -i ../unzip-6.0-consolidated_fixes-1.patch
+make -f unix/Makefile generic
+make prefix=/p/pde/tvpv/tools/ntc/usr/ MANDIR=/p/pde/tvpv/tools/ntc/usr/share/man/man1 -f unix/Makefile install
+
+
+
+ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.1.6.tar.bz2
+tar -xf alsa-lib-1.1.6.tar.bz2
+ 1616  tar -zxf cups-2.2.8-source.tar.gz
+ 1617  tar -xf cpio-2.12.tar.bz2
+ 1618  cd alsa-lib-1.1.6/
+ 1619  ./configure --prefix /p/pde/tvpv/tools/ntc/usr/
+ 1620  make -j10
+ 1621  make -j10 install
+
+https://ftp.gnu.org/gnu/cpio/cpio-2.12.tar.bz2
+./configure --prefix=/p/pde/tvpv/tools/ntc/usr \
+            --bindir=/p/pde/tvpv/tools/ntc/bin \
+            --enable-mt   \
+            --with-rmt=/p/pde/tvpv/tools/ntc/usr/libexec/rmt &&
+make &&
+makeinfo --html            -o doc/html      doc/cpio.texi &&
+makeinfo --html --no-split -o doc/cpio.html doc/cpio.texi &&
+makeinfo --plaintext       -o doc/cpio.txt  doc/cpio.texi
+
+make install &&
+install -v -m755 -d /p/pde/tvpv/tools/ntc/usr/share/doc/cpio-2.12/html &&
+
+
+
+http://hg.openjdk.java.net/jdk-updates/jdk10u/archive/jdk-10.0.2+13.tar.bz2
+unset JAVA_HOME                             &&
+bash configure --enable-unlimited-crypto    \
+               --disable-warnings-as-errors \
+               --with-stdc++lib=dynamic     \
+               --with-giflib=system         \
+               --with-jtreg=$PWD/jtreg      \
+               --with-lcms=system           \
+               --with-libjpeg=system        \
+               --with-libpng=system         \
+               --with-zlib=system           \
+               --with-version-build="13"    \
+               --with-version-pre=""        \
+               --with-version-opt=""        \
+               --with-cacerts-file=/etc/ssl/java/cacerts.jks &&
+make images
+
+# TODO makeca
+https://www.linuxfromscratch.org/blfs/view/8.3/postlfs/make-ca.html
+
+
+# jre
+http://anduin.linuxfromscratch.org/BLFS/OpenJDK/OpenJDK-10.0.2/OpenJDK-10.0.2+13-x86_64-bin.tar.xz
+tar -xf OpenJDK-10.0.2+13-x86_64-bin.tar.xz
+install -vdm755 /p/pde/tvpv/tools/ntc/opt/OpenJDK-10.0.2+13-bin && mv -v * /p/pde/tvpv/tools/ntc/opt/OpenJDK-10.0.2+13-bin         && rm -rf /p/pde/tvpv/tools/ntc/opt/jdk/ && ln -sfn OpenJDK-10.0.2+13-bin /p/pde/tvpv/tools/ntc/opt/jdk
+
+mkdir /p/pde/tvpv/tools/ntc/etc/profile.d
+cat > /p/pde/tvpv/tools/ntc/etc/profile.d/openjdk.sh << "EOF"
+# Begin /p/pde/tvpv/tools/ntc/etc/profile.d/openjdk.sh
+
+# Set JAVA_HOME directory
+JAVA_HOME=/p/pde/tvpv/tools/ntc/opt/jdk
+
+# Adjust PATH
+pathappend $JAVA_HOME/bin
+
+# Add to MANPATH
+pathappend $JAVA_HOME/man MANPATH
+
+# Auto Java CLASSPATH: Copy jar files to, or create symlinks in, the
+# /p/pde/tvpv/tools/ntc/usr/share/java directory. Note that having gcj jars with OpenJDK 8
+# may lead to errors.
+
+AUTO_CLASSPATH_DIR=/p/pde/tvpv/tools/ntc/usr/share/java
+
+pathprepend . CLASSPATH
+
+for dir in `find ${AUTO_CLASSPATH_DIR} -type d 2>/dev/null`; do
+    pathappend $dir CLASSPATH
+done
+
+for jar in `find ${AUTO_CLASSPATH_DIR} -name "*.jar" 2>/dev/null`; do
+    pathappend $jar CLASSPATH
+done
+
+export JAVA_HOME
+unset AUTO_CLASSPATH_DIR dir jar
+
+# End /p/pde/tvpv/tools/ntc/etc/profile.d/openjdk.sh
+EOF
+/p/pde/tvpv/tools/ntc/usr/sbin/make-ca -g --force &&
+ln -sfv /p/pde/tvpv/tools/ntc/etc/ssl/java/cacerts.jks /p/pde/tvpv/tools/ntc/opt/jdk/lib/security/cacerts
+cd /p/pde/tvpv/tools/ntc/opt/jdk
+bin/keytool -list -cacerts
+
+
+http://hg.openjdk.java.net/jdk-updates/jdk10u/archive/jdk-10.0.2+13.tar.bz2
+
+
+https://github.com/openjdk/jdk/archive/refs/tags/jdk-11+27.tar.gz
+
+https://github.com/openjdk/jdk/archive/refs/tags/jdk-18+37.tar.gz
+bash configure --prefix /p/pde/tvpv/tools/ntc/usr/
+
