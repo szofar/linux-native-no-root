@@ -168,6 +168,7 @@ if [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.0" ]]; then
     TOOL_XCB_PROTO="xcb-proto-1.15.2"
     TOOL_LIB_PTHREAD="libpthread-stubs-0.4"
     TOOL_XAU="libXau-1.0.9"
+    TOOL_SQLITE="sqlite-autoconf-3330000"
     TOOL_XPROTO="xproto-7.0.31"
     TOOL_CMAKE="cmake-3.26.1"
     TOOL_GDBM="gdbm-1.18"
@@ -234,6 +235,7 @@ elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     TOOL_INPUTPROTO="inputproto-2.3.2"
     TOOL_XCB_PROTO="xcb-proto-1.15.2"
     TOOL_LIB_PTHREAD="libpthread-stubs-0.4"
+    TOOL_SQLITE="sqlite-autoconf-3330000"
     TOOL_XAU="libXau-1.0.9"
     TOOL_XPROTO="xproto-7.0.31"
     TOOL_CMAKE="cmake-3.26.1"
@@ -324,6 +326,7 @@ TOOL_XCB_PROTO_FILE="${TOOL_XCB_PROTO}.tar.gz"
 TOOL_LIB_PTHREAD_FILE="${TOOL_LIB_PTHREAD}.tar.gz"
 TOOL_XAU_FILE="${TOOL_XAU}.tar.gz"
 TOOL_XPROTO_FILE="${TOOL_XPROTO}.tar.gz"
+TOOL_SQLITE="${TOOL_SQLITE}.tar.gz"
 TOOL_CMAKE_FILE="${TOOL_CMAKE}.tar.gz"
 TOOL_GDBM_FILE="${TOOL_GDBM}.tar.gz"
 TOOL_LIBFFI_FILE="${TOOL_LIBFFI}.tar.gz"
@@ -389,6 +392,7 @@ TOOL_SRC_XCB_PROTO="${NTC_SOURCE}/${TOOL_XCB_PROTO}"
 TOOL_SRC_LIB_PTHREAD="${NTC_SOURCE}/${TOOL_LIB_PTHREAD}"
 TOOL_SRC_XAU="${NTC_SOURCE}/${TOOL_XAU}"
 TOOL_SRC_XPROTO="${NTC_SOURCE}/${TOOL_XPROTO}"
+TOOL_SRC_SQLITE="${NTC_SOURCE}/${TOOL_SQLITE}"
 TOOL_SRC_CMAKE="${NTC_SOURCE}/${TOOL_CMAKE}"
 TOOL_SRC_GDBM="${NTC_SOURCE}/${TOOL_GDBM}"
 TOOL_SRC_LIBFFI="${NTC_SOURCE}/${TOOL_LIBFFI}"
@@ -460,6 +464,7 @@ https://www.x.org/archive/individual/xcb/${TOOL_XCB_PROTO_FILE}
 https://www.x.org/archive/individual/xcb/${TOOL_LIB_PTHREAD_FILE}
 https://www.x.org/releases/individual/lib/${TOOL_XAU_FILE}
 https://www.x.org/archive/individual/proto/${TOOL_XPROTO_FILE}
+https://sqlite.org/2020/${TOOL_SQLITE_FILE}
 https://www.python.org/ftp/python/${TOOL_PYTHON_VERSION}/${TOOL_PYTHON_FILE}
 https://github.com/libexpat/libexpat/releases/download/${TOOL_EXPAT_VERSION}/${TOOL_EXPAT_FILE}
 https://www.gnupg.org/ftp/gcrypt/gnutls/v${TOOL_GNUTLS_VERSION}/${TOOL_GNUTLS_FILE}
@@ -2982,10 +2987,31 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 
 ######################################################
-# 5.38 Python - Pass 2
+# 5.38 INSTALL SQLITE
 ######################################################
 
-printf "\n\n\n\n\n... 5.38 - Installing Python - Pass 2\n\n"
+printf "\n\n\n\n\n... 5.38 - Installing SQLITE\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_SQLITE}"
+untar "${NTC_SOURCE}/${TOOL_SQLITE_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_SQLITE}/build" &&
+cd "${TOOL_SRC_SQLITE}/build"        &&
+"${TOOL_SRC_SQLITE}/configure"        \
+    --prefix="${NTC}/usr"            &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.39 Python - Pass 2
+######################################################
+
+printf "\n\n\n\n\n... 5.39 - Installing Python - Pass 2\n\n"
 
 # remove existing
 printf "Removing existing source directory if it exists...\n"
@@ -3014,10 +3040,10 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 
 ######################################################
-# 5.39 Cmake
+# 5.40 Cmake
 ######################################################
 
-printf "\n\n\n\n\n... 5.39 - Installing Cmake\n\n"
+printf "\n\n\n\n\n... 5.40 - Installing Cmake\n\n"
 
 # remove existing
 printf "Removing existing source directory if it exists...\n"
@@ -3053,10 +3079,10 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 
 ######################################################
-# 5.40 INSTALL WHICH
+# 5.41 INSTALL WHICH
 ######################################################
 
-printf "\n\n\n\n\n... 5.40 - Installing WHICH\n\n"
+printf "\n\n\n\n\n... 5.41 - Installing WHICH\n\n"
 
 # remove existing
 printf "Removing existing source directory if it exists...\n"
