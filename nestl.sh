@@ -33,6 +33,7 @@ NTC_VERSION=1.0.0
 NTC_SOURCE="${NTC_SOURCE:-$NTC}/source"
 NTC_TOOLS="${NTC}/tools"
 NTC_MAKE_FLAGS=${NTC_MAKE_FLAGS:-"-j$(nproc)"}
+GIT=${GIT:-"git"}
 
 # tell the user what's up
 printf "\n\nCreating native toolchain without root...\n\n"
