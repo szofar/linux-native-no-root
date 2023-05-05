@@ -94,10 +94,10 @@ set_env "ftp_proxy"   "${FTP_PROXY}"
 
 # git proxy setup if required
 # if [[ ! -z "${HTTP_PROXY}" ]]; then
-#     git config --global http.proxy "${HTTP_PROXY}"
+#     $GIT config --global http.proxy "${HTTP_PROXY}"
 # fi
 # if [[ ! -z "${HTTPS_PROXY}" ]]; then
-#     git config --global https.proxy "${HTTPS_PROXY}"
+#     $GIT config --global https.proxy "${HTTPS_PROXY}"
 # fi
 
 
@@ -327,7 +327,7 @@ TOOL_XCB_PROTO_FILE="${TOOL_XCB_PROTO}.tar.gz"
 TOOL_LIB_PTHREAD_FILE="${TOOL_LIB_PTHREAD}.tar.gz"
 TOOL_XAU_FILE="${TOOL_XAU}.tar.gz"
 TOOL_XPROTO_FILE="${TOOL_XPROTO}.tar.gz"
-TOOL_SQLITE="${TOOL_SQLITE}.tar.gz"
+TOOL_SQLITE_FILE="${TOOL_SQLITE}.tar.gz"
 TOOL_CMAKE_FILE="${TOOL_CMAKE}.tar.gz"
 TOOL_GDBM_FILE="${TOOL_GDBM}.tar.gz"
 TOOL_LIBFFI_FILE="${TOOL_LIBFFI}.tar.gz"
