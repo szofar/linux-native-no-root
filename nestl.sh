@@ -420,7 +420,7 @@ https://sourceforge.net/projects/tcl/files/Tcl/${TOOL_TCL_VERSION}/${TOOL_TCL_FI
 https://sourceforge.net/projects/expect/files/Expect/${TOOL_EXPECT_VERSION}/${TOOL_EXPECT_FILE}
 https://ftp.gnu.org/gnu/dejagnu/${TOOL_DEJAGNU_FILE}
 https://sourceforge.net/projects/check/files/check/${TOOL_CHECK_VERSION}/${TOOL_CHECK_FILE}
-http://ftp.gnu.org/gnu//ncurses/${TOOL_NCURSES_FILE}
+http://ftp.gnu.org/gnu/ncurses/${TOOL_NCURSES_FILE}
 http://ftp.gnu.org/gnu/bash/${TOOL_BASH_FILE}
 https://sourceware.org/pub/bzip2/${TOOL_BZIP2_FILE}
 http://ftp.gnu.org/gnu/coreutils/${TOOL_COREUTILS_FILE}
@@ -3098,4 +3098,71 @@ cd "${TOOL_SRC_WHICH}/build"        &&
 
 make "${NTC_MAKE_FLAGS}" &&
 make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+# TODO clean these up
+# https://github.com/strace/strace/releases/download/v5.14/strace-5.14.tar.xz
+# ./configure --prefix=$NTC/usr/ \
+# --enable-gcc-Werror \
+# --with-libiberty
+# 
+# 
+# https://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz
+# ######################################################
+# # 5.8 INSTALL NCURSES 5
+# ######################################################
+# 
+# printf "\n\n\n\n\n... 5.8 - Installing Ncurses 5.0\n\n"
+# 
+# # remove existing
+# printf "Removing existing source directory if it exists...\n"
+# rm -rf "${TOOL_SRC_NCURSES}"
+# untar "${NTC_SOURCE}/${TOOL_NCURSES_FILE}"
+# 
+# cd "${TOOL_SRC_NCURSES}"
+# sed -i s/mawk// configure
+# 
+# # configure the build
+# mkdir -vp "${TOOL_SRC_NCURSES}/build" &&
+# cd "${TOOL_SRC_NCURSES}/build"        &&
+# CPPFLAGS="-P" \
+# "${TOOL_SRC_NCURSES}/configure"        \
+#     --prefix="${NTC}/opt"              \
+#     --with-shared                      \
+#     --enable-widec                     \
+#     --without-debug                   &&
+# 
+# make "${NTC_MAKE_FLAGS}" &&
+# 
+# make "${NTC_MAKE_FLAGS}" install
+# 
+# chmod -v 644 $NTC/opt/lib/libncurses++w.a
+# mv -v $NTC/opt/lib/libncursesw.so.5* $NTC/lib
+# ln -sfv ../../lib/libncursesw.so.5 $NTC/opt/lib/libncursesw.so
+# for lib in curses ncurses form panel menu ; do \
+# rm -vf $NTC/opt/lib/lib${lib}.so ; \
+# echo "INPUT(-l${lib}w)" >$NTC/opt/lib/lib${lib}.so ; \
+# ln -sfv lib${lib}w.a $NTC/opt/lib/lib${lib}.a ; \
+# done
+# ln -sfv libncurses++w.a $NTC/opt/lib/libncurses++.a
+# 
+# rm -vf $NTC/opt/lib/libcursesw.so
+# echo "INPUT(-lncursesw)" >$NTC/opt/lib/libcursesw.so
+# ln -sfv libncurses.so $NTC/opt/lib/libcurses.so
+# ln -sfv libncursesw.a $NTC/opt/lib/libcursesw.a
+# ln -sfv libncurses.a $NTC/opt/lib/libcurses.a
+# 
+# make distclean
+# ../configure --prefix=$NTC/opt --with-shared --without-normal \
+# --without-debug --without-cxx-binding
+# make "${NTC_MAKE_FLAGS}" sources libs
+# cp -av lib/lib*.so.5* $NTC/opt/lib
+
+
+# TODO these require installing java on nestL (JAVA_HOME)
+#   Not able to edit ./java linker path in the package
+# https://download.jetbrains.com/python/pycharm-professional-2023.1.1.tar.gz
+
+# export LD_LIBRARY_PATH="${NTC}/usr/lib"
+# LD_LIBRARY_PATH=$NTC/usr/lib:$NTC/opt/lib bash $NTC/source/pycharm-2023.1.1/bin/pycharm.sh
 
