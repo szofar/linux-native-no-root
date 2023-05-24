@@ -175,6 +175,8 @@ if [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.0" ]]; then
     TOOL_GDBM="gdbm-1.18"
     TOOL_LIBFFI="libffi-3.3"
     TOOL_WHICH="which-2.21"
+    TOOL_LIBEVENT="libevent-2.1.12-stable"
+    TOOL_TMUX="tmux-3.3a"
     
 elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     PATCHES="https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.22-upstream_i386_fix-1.patch"$'\n'"https://web.archive.org/web/20210617235627/http://www.linuxfromscratch.org/patches/lfs/7.8/readline-6.3-upstream_fixes-3.patch"$'\n'"http://lfs.linux-sysadmin.com/patches/downloads/glibc/glibc-2.22-fhs-1.patch"
@@ -242,6 +244,9 @@ elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     TOOL_CMAKE="cmake-3.26.1"
     TOOL_GDBM="gdbm-1.18"
     TOOL_LIBFFI="libffi-3.3"
+    TOOL_LIBEVENT="libevent-2.1.12-stable"
+    TOOL_TMUX="tmux-3.3a"
+
 fi;
 
 # we need the version for some downloads
@@ -266,6 +271,8 @@ TOOL_BZIP2_MAJOR_VERSION="$(echo ${TOOL_BZIP2} | cut -d'.' -f 1 | cut -d'-' -f 2
 TOOL_LIBFFI_VERSION="$(echo ${TOOL_LIBFFI} | cut -d'-' -f 2)"
 TOOL_NCURSES_VERSION="$(echo ${TOOL_NCURSES} | cut -d'-' -f 2 )"
 TOOL_NCURSES_MAJOR_VERSION="$(echo ${TOOL_NCURSES} | cut -d'.' -f 1 | cut -d'-' -f 2 )"
+TOOL_LIBEVENT_VERSION="$(echo ${TOOL_LIBEVENT} | cut -d'-' -f 2 )-$(echo ${TOOL_LIBEVENT} | cut -d'-' -f 3 )"
+TOOL_TMUX_VERSION="$(echo ${TOOL_TMUX} | cut -d'-' -f 2 )"
 
 # tool with extension
 TOOL_BINUTILS_FILE="${TOOL_BINUTILS}.tar.bz2"
@@ -332,6 +339,8 @@ TOOL_CMAKE_FILE="${TOOL_CMAKE}.tar.gz"
 TOOL_GDBM_FILE="${TOOL_GDBM}.tar.gz"
 TOOL_LIBFFI_FILE="${TOOL_LIBFFI}.tar.gz"
 TOOL_WHICH_FILE="${TOOL_WHICH}.tar.gz"
+TOOL_LIBEVENT_FILE="${TOOL_LIBEVENT}.tar.gz"
+TOOL_TMUX_FILE="${TOOL_TMUX}.tar.gz"
 
 # all source directories
 TOOL_SRC_BINUTILS="${NTC_SOURCE}/${TOOL_BINUTILS}"
@@ -398,6 +407,8 @@ TOOL_SRC_CMAKE="${NTC_SOURCE}/${TOOL_CMAKE}"
 TOOL_SRC_GDBM="${NTC_SOURCE}/${TOOL_GDBM}"
 TOOL_SRC_LIBFFI="${NTC_SOURCE}/${TOOL_LIBFFI}"
 TOOL_SRC_WHICH="${NTC_SOURCE}/${TOOL_WHICH}"
+TOOL_SRC_LIBEVENT="${NTC_SOURCE}/${TOOL_LIBEVENT}"
+TOOL_SRC_TMUX="${NTC_SOURCE}/${TOOL_TMUX}"
 
 
 ######################################################
@@ -473,8 +484,11 @@ https://github.com/Kitware/CMake/releases/download/v${TOOL_CMAKE_VERSION}/${TOOL
 https://ftp.gnu.org/gnu/gdbm/${TOOL_GDBM_FILE}
 https://github.com/libffi/libffi/releases/download/v${TOOL_LIBFFI_VERSION}/${TOOL_LIBFFI_FILE}
 https://ftp.gnu.org/gnu/which/${TOOL_WHICH_FILE}
+https://github.com/libevent/libevent/releases/download/release-${TOOL_LIBEVENT_VERSION}/${TOOL_LIBEVENT_FILE}
+https://github.com/tmux/tmux/releases/download/${TOOL_TMUX_VERSION}/${TOOL_TMUX_FILE}
 $PATCHES
 EOF
+
 
 # options for wget
 wget_opts=""
@@ -3098,4 +3112,50 @@ cd "${TOOL_SRC_WHICH}/build"        &&
 
 make "${NTC_MAKE_FLAGS}" &&
 make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.42 INSTALL LIBEVENT
+######################################################
+
+printf "\n\n\n\n\n... 5.42 - Installing LIBEVENT\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_LIBEVENT}"
+untar "${NTC_SOURCE}/${TOOL_LIBEVENT_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_LIBEVENT}/build" &&
+cd "${TOOL_SRC_LIBEVENT}/build"        &&
+"${TOOL_SRC_LIBEVENT}/configure"        \
+    --prefix="${NTC}/usr"               \
+    --enable-shared                    &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+######################################################
+# 5.43 INSTALL TMUX
+######################################################
+
+printf "\n\n\n\n\n... 5.43 - Installing TMUX\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_TMUX}"
+untar "${NTC_SOURCE}/${TOOL_TMUX_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_TMUX}/build"  &&
+cd "${TOOL_SRC_TMUX}/build"         &&
+PKG_CONFIG_PATH="${NTC}/usr/local/lib/pkgconfig" \
+"${TOOL_SRC_TMUX}/configure"         \
+    --prefix="${NTC}/usr/local"      \
+# TODO enable once ncursesw is here    --enable-static                 &&
+
+make "${NTC_MAKE_FLAGS}" &&
+make "${NTC_MAKE_FLAGS}" install || exit 1
+
 
