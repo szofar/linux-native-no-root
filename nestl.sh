@@ -29,7 +29,7 @@
 
 NTC="${NTC:-$PWD}"
 NTC_NAME="$(uname -m)-tmp-linux-gnu"
-NTC_VERSION=1.0.0
+NTC_VERSION=1.2.0
 NTC_SOURCE="${NTC_SOURCE:-$NTC}/source"
 NTC_TOOLS="${NTC}/tools"
 NTC_MAKE_FLAGS=${NTC_MAKE_FLAGS:-"-j$(nproc)"}
@@ -177,9 +177,11 @@ if [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.0" ]]; then
     TOOL_WHICH="which-2.21"
     TOOL_LIBEVENT="libevent-2.1.12-stable"
     TOOL_TMUX="tmux-3.3a"
+    TOOL_CF="cf8-cli_8.6.1_linux_x86-64"
     
-elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
-    PATCHES="https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.22-upstream_i386_fix-1.patch"$'\n'"https://web.archive.org/web/20210617235627/http://www.linuxfromscratch.org/patches/lfs/7.8/readline-6.3-upstream_fixes-3.patch"$'\n'"http://lfs.linux-sysadmin.com/patches/downloads/glibc/glibc-2.22-fhs-1.patch"
+# coreutils upgrade
+elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.2" ]]; then
+PATCHES="https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.22-upstream_i386_fix-1.patch"$'\n'"https://web.archive.org/web/20210617235627/http://www.linuxfromscratch.org/patches/lfs/7.8/readline-6.3-upstream_fixes-3.patch"$'\n'"http://lfs.linux-sysadmin.com/patches/downloads/glibc/glibc-2.22-fhs-1.patch"
     TOOL_SHADOW_HASH="2bfafe7d4962682d31b5eba65dba4fc8"
     TOOL_LIBSTDCPP="libstdc++-v3"
     TOOL_BINUTILS="binutils-2.25.1"
@@ -194,7 +196,7 @@ elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     TOOL_NCURSES="ncurses-6.0"
     TOOL_BASH="bash-4.3.30"
     TOOL_BZIP2="bzip2-1.0.6"
-    TOOL_COREUTILS="coreutils-8.24"
+    TOOL_COREUTILS="coreutils-9.2"
     TOOL_DIFFUTILS="diffutils-3.3"
     TOOL_FILE="file-5.24"
     TOOL_FINDUTILS="findutils-4.4.2"
@@ -238,14 +240,16 @@ elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.1" ]]; then
     TOOL_INPUTPROTO="inputproto-2.3.2"
     TOOL_XCB_PROTO="xcb-proto-1.15.2"
     TOOL_LIB_PTHREAD="libpthread-stubs-0.4"
-    TOOL_SQLITE="sqlite-autoconf-3330000"
     TOOL_XAU="libXau-1.0.9"
+    TOOL_SQLITE="sqlite-autoconf-3330000"
     TOOL_XPROTO="xproto-7.0.31"
     TOOL_CMAKE="cmake-3.26.1"
     TOOL_GDBM="gdbm-1.18"
     TOOL_LIBFFI="libffi-3.3"
+    TOOL_WHICH="which-2.21"
     TOOL_LIBEVENT="libevent-2.1.12-stable"
     TOOL_TMUX="tmux-3.3a"
+    TOOL_CF="cf8-cli_8.6.1_linux_x86-64"
 
 fi;
 
@@ -273,6 +277,9 @@ TOOL_NCURSES_VERSION="$(echo ${TOOL_NCURSES} | cut -d'-' -f 2 )"
 TOOL_NCURSES_MAJOR_VERSION="$(echo ${TOOL_NCURSES} | cut -d'.' -f 1 | cut -d'-' -f 2 )"
 TOOL_LIBEVENT_VERSION="$(echo ${TOOL_LIBEVENT} | cut -d'-' -f 2 )-$(echo ${TOOL_LIBEVENT} | cut -d'-' -f 3 )"
 TOOL_TMUX_VERSION="$(echo ${TOOL_TMUX} | cut -d'-' -f 2 )"
+TOOL_CF_VERSION="$(echo ${TOOL_CF} | cut -d'_' -f 2 )"
+TOOL_CF_MAJOR_VERSION="$(echo ${TOOL_CF} | cut -d'_' -f 2 | cut -d'.' -f 1 )"
+
 
 # tool with extension
 TOOL_BINUTILS_FILE="${TOOL_BINUTILS}.tar.bz2"
@@ -341,6 +348,8 @@ TOOL_LIBFFI_FILE="${TOOL_LIBFFI}.tar.gz"
 TOOL_WHICH_FILE="${TOOL_WHICH}.tar.gz"
 TOOL_LIBEVENT_FILE="${TOOL_LIBEVENT}.tar.gz"
 TOOL_TMUX_FILE="${TOOL_TMUX}.tar.gz"
+TOOL_CF_FILE="${TOOL_CF}.tgz"
+
 
 # all source directories
 TOOL_SRC_BINUTILS="${NTC_SOURCE}/${TOOL_BINUTILS}"
@@ -486,6 +495,7 @@ https://github.com/libffi/libffi/releases/download/v${TOOL_LIBFFI_VERSION}/${TOO
 https://ftp.gnu.org/gnu/which/${TOOL_WHICH_FILE}
 https://github.com/libevent/libevent/releases/download/release-${TOOL_LIBEVENT_VERSION}/${TOOL_LIBEVENT_FILE}
 https://github.com/tmux/tmux/releases/download/${TOOL_TMUX_VERSION}/${TOOL_TMUX_FILE}
+https://s3-us-west-1.amazonaws.com/v${TOOL_CF_MAJOR_VERSION}-cf-cli-releases/releases/v${TOOL_CF_VERSION}/${TOOL_CF_FILE}
 $PATCHES
 EOF
 
@@ -3158,4 +3168,17 @@ PKG_CONFIG_PATH="${NTC}/usr/local/lib/pkgconfig" \
 make "${NTC_MAKE_FLAGS}" &&
 make "${NTC_MAKE_FLAGS}" install || exit 1
 
+
+######################################################
+# 5.44 INSTALL CF
+######################################################
+
+printf "\n\n\n\n\n... 5.44 - Installing CF\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+untar "${NTC_SOURCE}/${TOOL_CF_FILE}"
+
+cp "${NTC_SOURCE}/cf" "${NTC}/usr/local/bin/"
+cp "${NTC_SOURCE}/cf${TOOL_CF_MAJOR_VERSION}" "${NTC}/usr/local/bin/"
 
