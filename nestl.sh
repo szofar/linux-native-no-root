@@ -3052,9 +3052,10 @@ untar "${NTC_SOURCE}/${TOOL_PYTHON_FILE}"
 rm -rf "${TOOL_SRC_PYTHON}/build"    &&
 mkdir -vp "${TOOL_SRC_PYTHON}/build" &&
 cd "${TOOL_SRC_PYTHON}/build"        &&
-LDFLAGS="-L${NTC}/usr/lib"           \
+LDFLAGS="-L${NTC}/usr/lib -Wl,rpath ${NTC}/usr/lib"           \
 CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
 CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
+LD_RUN_PATH="${NTC}/usr/lib"                                  \
 "${TOOL_SRC_PYTHON}/configure"                   \
     --prefix=${NTC}/usr                          \
     --with-openssl=${NTC}/usr/                   \
@@ -3065,6 +3066,10 @@ CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
     --with-tcltk-libs="${NTC}/usr/lib/${TOOL_TCL_LIB_VERSION}.so ${NTC}/usr/lib/${TOOL_TK_LIB_VERSION}.so" &&
 
 # make and install the tool
+LDFLAGS="-L${NTC}/usr/lib -Wl,rpath ${NTC}/usr/lib"           \
+CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
+CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
+LD_RUN_PATH="${NTC}/usr/lib"                                  \
 make ${NTC_MAKE_FLAGS} &&
 make ${NTC_MAKE_FLAGS} install || exit 1
 
