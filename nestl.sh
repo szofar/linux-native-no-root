@@ -3091,7 +3091,8 @@ cd "${TOOL_SRC_CMAKE}/build"        &&
     --system-bzip2                                     \
     --parallel=36                                      \
     --docdir=${NTC}/usr/share/doc/${TOOL_CMAKE}        \
-    -- -DBUILD_CursesDialog=ON                         \
+    --                                                 \
+    -DBUILD_CursesDialog=ON                            \
     -DZLIB_LIBRARY=${NTC}/usr/lib/libz.so              \
     -DBZIP2_LIBRARY=${NTC}/usr/lib/libbz2.so           \
     -DEXPAT_LIBRARY=${NTC}/usr/lib/libexpat.so         \
