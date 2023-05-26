@@ -19,6 +19,11 @@
 # TODO: STD_STARTFILE_PREFIX_1 ignored for "cross" compilers!
 #       even though this is technically native
 # TODO: md5 sums
+# TODO: CMAKE bz2 not found correctly
+#       --system-bzip2
+#       -DBZIP2_LIBRARY=${NTC}/usr/lib/libbz2.so           \
+#       Found BZip2: /usr/lib64/libbz2.so (found version "1.0.5") 
+# TODO: CMAKE looking for cbreak in /usr/lib version of ncurses??
 #
 ######################################################################
 
@@ -3077,12 +3082,6 @@ untar "${NTC_SOURCE}/${TOOL_CMAKE_FILE}"
 
 cd "${TOOL_SRC_CMAKE}"
 sed -i '/"lib64"/s/64//' Modules/GNUInstallDirs.cmake
-
-
-# TODO bz2 not found correctly
-# --system-bzip2
-# -DBZIP2_LIBRARY=${NTC}/usr/lib/libbz2.so           \
-# Found BZip2: /usr/lib64/libbz2.so (found version "1.0.5") 
 
 
 # configure the build
