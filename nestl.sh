@@ -3078,6 +3078,13 @@ untar "${NTC_SOURCE}/${TOOL_CMAKE_FILE}"
 cd "${TOOL_SRC_CMAKE}"
 sed -i '/"lib64"/s/64//' Modules/GNUInstallDirs.cmake
 
+
+# TODO bz2 not found correctly
+# --system-bzip2
+# -DBZIP2_LIBRARY=${NTC}/usr/lib/libbz2.so           \
+# Found BZip2: /usr/lib64/libbz2.so (found version "1.0.5") 
+
+
 # configure the build
 rm -rf "${TOOL_SRC_CMAKE}/build"    &&
 mkdir -vp "${TOOL_SRC_CMAKE}/build" &&
@@ -3088,13 +3095,12 @@ cd "${TOOL_SRC_CMAKE}/build"        &&
     --verbose                                          \
     --system-zlib                                      \
     --system-expat                                     \
-    --system-bzip2                                     \
+    --no-system-bzip2                                  \
     --parallel=36                                      \
     --docdir=${NTC}/usr/share/doc/${TOOL_CMAKE}        \
     --                                                 \
     -DBUILD_CursesDialog=ON                            \
     -DZLIB_LIBRARY=${NTC}/usr/lib/libz.so              \
-    -DBZIP2_LIBRARY=${NTC}/usr/lib/libbz2.so           \
     -DEXPAT_LIBRARY=${NTC}/usr/lib/libexpat.so         \
     -DCURSES_LIBRARY=${NTC}/usr/lib/libncursesw.so.${TOOL_NCURSES_MAJOR_VERSION} \
     -DCURSES_INCLUDE_PATH=${NTC}/usr/include/ncursesw &&
