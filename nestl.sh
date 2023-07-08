@@ -183,6 +183,7 @@ if [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.0" ]]; then
     TOOL_LIBEVENT="libevent-2.1.12-stable"
     TOOL_TMUX="tmux-3.3a"
     TOOL_CF="cf8-cli_8.6.1_linux_x86-64"
+    TOOL_KERBEROS="krb5-1.21"
     
 # coreutils upgrade
 elif [[ $(echo $NTC_VERSION | cut -d'.' -f 1,2) = "1.2" ]]; then
@@ -255,6 +256,7 @@ PATCHES="https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.22-ups
     TOOL_LIBEVENT="libevent-2.1.12-stable"
     TOOL_TMUX="tmux-3.3a"
     TOOL_CF="cf8-cli_8.6.1_linux_x86-64"
+    TOOL_KERBEROS="krb5-1.21"
 
 fi;
 
@@ -284,6 +286,8 @@ TOOL_LIBEVENT_VERSION="$(echo ${TOOL_LIBEVENT} | cut -d'-' -f 2 )-$(echo ${TOOL_
 TOOL_TMUX_VERSION="$(echo ${TOOL_TMUX} | cut -d'-' -f 2 )"
 TOOL_CF_VERSION="$(echo ${TOOL_CF} | cut -d'_' -f 2 )"
 TOOL_CF_MAJOR_VERSION="$(echo ${TOOL_CF} | cut -d'_' -f 2 | cut -d'.' -f 1 )"
+TOOL_KERBEROS_VERSION="$(echo ${TOOL_KERBEROS} | cut -d'-' -f 2 )"
+TOOL_KERBEROS_MAJOR_VERSION="$(echo ${TOOL_KERBEROS} | cut -d'-' -f 1 )"
 
 
 # tool with extension
@@ -354,6 +358,7 @@ TOOL_WHICH_FILE="${TOOL_WHICH}.tar.gz"
 TOOL_LIBEVENT_FILE="${TOOL_LIBEVENT}.tar.gz"
 TOOL_TMUX_FILE="${TOOL_TMUX}.tar.gz"
 TOOL_CF_FILE="${TOOL_CF}.tgz"
+TOOL_KERBEROS_FILE="${TOOL_KERBEROS}.tar.gz"
 
 
 # all source directories
@@ -423,6 +428,7 @@ TOOL_SRC_LIBFFI="${NTC_SOURCE}/${TOOL_LIBFFI}"
 TOOL_SRC_WHICH="${NTC_SOURCE}/${TOOL_WHICH}"
 TOOL_SRC_LIBEVENT="${NTC_SOURCE}/${TOOL_LIBEVENT}"
 TOOL_SRC_TMUX="${NTC_SOURCE}/${TOOL_TMUX}"
+TOOL_SRC_KERBEROS="${NTC_SOURCE}/${TOOL_KERBEROS}"
 
 
 ######################################################
@@ -501,6 +507,7 @@ https://ftp.gnu.org/gnu/which/${TOOL_WHICH_FILE}
 https://github.com/libevent/libevent/releases/download/release-${TOOL_LIBEVENT_VERSION}/${TOOL_LIBEVENT_FILE}
 https://github.com/tmux/tmux/releases/download/${TOOL_TMUX_VERSION}/${TOOL_TMUX_FILE}
 https://s3-us-west-1.amazonaws.com/v${TOOL_CF_MAJOR_VERSION}-cf-cli-releases/releases/v${TOOL_CF_VERSION}/${TOOL_CF_FILE}
+https://web.mit.edu/kerberos/dist/${TOOL_KERBEROS_MAJOR_VERSION}/${TOOL_KERBEROS_VERSION}/${TOOL_KERBEROS_FILE}
 $PATCHES
 EOF
 
@@ -2894,13 +2901,16 @@ untar "${NTC_SOURCE}/${TOOL_PERL_FILE}"
 
 # configure the build
 cd "${TOOL_SRC_PERL}" &&
-sh Configure -des -Dprefix=${NTC}/usr -Dlibs=-lm &&
+sh Configure -des -Dprefix=${NTC}/usr \
+    -Dvendorprefix=${NTC}/usr         \
+    -Dlibs=-lm &&
 
 # make and install the tool
 make ${NTC_MAKE_FLAGS} &&
-cp -v perl cpan/podlators/pod2man ${NTC}/usr/bin &&
-mkdir -pv ${NTC}/usr/lib/perl${TOOL_PERL_MAJOR}/${TOOL_PERL_VERSION} &&
-cp -Rv lib/* ${NTC}/usr/lib/perl${TOOL_PERL_MAJOR}/${TOOL_PERL_VERSION} || exit 1
+make "${NTC_MAKE_FLAGS}" install || exit 1
+# cp -v perl cpan/podlators/pod2man ${NTC}/usr/bin &&
+# mkdir -pv ${NTC}/usr/lib/perl${TOOL_PERL_MAJOR}/${TOOL_PERL_VERSION} &&
+# cp -Rv lib/* ${NTC}/usr/lib/perl${TOOL_PERL_MAJOR}/${TOOL_PERL_VERSION} || exit 1
 
 
 ######################################################
@@ -3035,6 +3045,41 @@ cd "${TOOL_SRC_SQLITE}/build"        &&
 
 make "${NTC_MAKE_FLAGS}" &&
 make "${NTC_MAKE_FLAGS}" install || exit 1
+
+
+
+######################################################
+# 5.39 GSSAPI
+######################################################
+
+printf "\n\n\n\n\n... 5.39 - Installing GSSAPI\n\n"
+
+# remove existing
+printf "Removing existing source directory if it exists...\n"
+rm -rf "${TOOL_SRC_KERBEROS}"
+untar "${NTC_SOURCE}/${TOOL_KERBEROS_FILE}"
+
+# configure the build
+mkdir -vp "${TOOL_SRC_KERBEROS}/build" &&
+cd "${TOOL_SRC_KERBEROS}/build"        &&
+LDFLAGS="-L${NTC}/usr/lib"                                    \
+CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
+CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
+LD_RUN_PATH="${NTC}/usr/lib"                                  \
+"${TOOL_SRC_KERBEROS}/src/configure"    \
+    --prefix="${NTC}/usr"               \
+    --enable-shared                    &&
+
+make "${NTC_MAKE_FLAGS}"               &&
+make install || exit 1
+
+# install
+# cp lib/libgssapi_krb5.a "${NTC}/usr/lib/" &&
+# cp lib/libkrb5.a "${NTC}/usr/lib/"        &&
+# cp lib/libk5crypto.a "${NTC}/usr/lib/" || exit 1
+
+# ln -s /usr/bin/krb5-config.mit /usr/bin/krb5-config
+# ln -s /usr/lib/x86_64-linux-gnu/libgssapi_krb5.so.2 /usr/lib/libgssapi_krb5.so
 
 
 ######################################################
