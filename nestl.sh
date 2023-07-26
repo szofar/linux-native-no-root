@@ -24,6 +24,8 @@
 #       -DBZIP2_LIBRARY=${NTC}/usr/lib/libbz2.so           \
 #       Found BZip2: /usr/lib64/libbz2.so (found version "1.0.5") 
 # TODO: CMAKE looking for cbreak in /usr/lib version of ncurses??
+# TODO: currently kerberos install uses a hybrid of the host system and nestl which is not ideal
+#       kerberos requires ncurses5.0 (need to install in parallel with 6.0 due to other packages)
 #
 ######################################################################
 
@@ -3062,7 +3064,9 @@ untar "${NTC_SOURCE}/${TOOL_KERBEROS_FILE}"
 # configure the build
 mkdir -vp "${TOOL_SRC_KERBEROS}/build" &&
 cd "${TOOL_SRC_KERBEROS}/build"        &&
-LDFLAGS="-L${NTC}/usr/lib"                                    \
+LDFLAGS="-L${NTC}/usr/local/lib -L${NTC}/usr/lib"             \
+LD_LIBRARY_PATH=${NTC}/usr/local/lib:${NTC}/usr/lib           \
+LIBRARY_PATH=${NTC}/usr/local/lib:${NTC}/usr/lib              \
 CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
 CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
 LD_RUN_PATH="${NTC}/usr/lib"                                  \
@@ -3072,6 +3076,9 @@ LD_RUN_PATH="${NTC}/usr/lib"                                  \
 
 make "${NTC_MAKE_FLAGS}"               &&
 make install || exit 1
+
+# TODO test
+# > env LD_LIBRARY_PATH=${NTC}/usr/local/lib:${NTC}/usr/lib LIBRARY_PATH=${NTC}/usr/local/lib:${NTC}/usr/lib PATH=${NTC}/usr/local/bin:${NTC}/usr/local/sbin:${NTC}/usr/bin:${NTC}/usr/sbin krb5-config --cflags krb5
 
 # install
 # cp lib/libgssapi_krb5.a "${NTC}/usr/lib/" &&
