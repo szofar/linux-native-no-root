@@ -3064,9 +3064,7 @@ untar "${NTC_SOURCE}/${TOOL_KERBEROS_FILE}"
 # configure the build
 mkdir -vp "${TOOL_SRC_KERBEROS}/build" &&
 cd "${TOOL_SRC_KERBEROS}/build"        &&
-LDFLAGS="-L${NTC}/usr/local/lib -L${NTC}/usr/lib"             \
-LD_LIBRARY_PATH=${NTC}/usr/local/lib:${NTC}/usr/lib           \
-LIBRARY_PATH=${NTC}/usr/local/lib:${NTC}/usr/lib              \
+LDFLAGS="-L${NTC}/usr/lib"                                    \
 CFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw"   \
 CPPFLAGS="-I${NTC}/usr/include -I${NTC}/usr/include/ncursesw" \
 LD_RUN_PATH="${NTC}/usr/lib"                                  \
