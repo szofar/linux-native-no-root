@@ -435,6 +435,7 @@ TOOL_SRC_KERBEROS="${NTC_SOURCE}/${TOOL_KERBEROS}"
 
 ######################################################
 # 0.3 GET TOOLS
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 0.3 - Getting Tools\n"
@@ -561,6 +562,7 @@ wget --tries 5 --retry-connrefused -nc -i "${NTC_SOURCE}/sources.txt" --director
 
 ######################################################
 # 1.0 INSTALL BINUTILS
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 1.0 - Installing Binutils\n\n"
@@ -602,6 +604,7 @@ make ${NTC_MAKE_FLAGS} DESTDIR=${NTC} install || exit 1
 
 ######################################################
 # 1.1 INSTALL GCC
+#   = 5 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 1.1 - Installing GCC\n\n"
@@ -672,6 +675,7 @@ make ${NTC_MAKE_FLAGS} DESTDIR="${NTC}" install || exit 1
 
 ######################################################
 # 1.2 INSTALL LINUX HEADERS
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 1.2 - Installing Linux Kernel Headers\n\n"
@@ -691,6 +695,7 @@ cp -rv dest/include/* "${NTC_TOOLS}/include" || exit 1
 
 ######################################################
 # 1.3 INSTALL GLIBC 
+#   = 3 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 1.3 - Installing Glibc\n\n"
@@ -731,6 +736,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 1.4 TEST PREVIOUS 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 1.4 - Testing Previous\n\n"
@@ -774,6 +780,7 @@ rm -v dummy.c a.out dummy.log
 
 ######################################################
 # 1.5 INSTALL LIBSTDC++ 
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 1.5 - Installing LIBSTDC++\n\n"
@@ -807,6 +814,7 @@ make ${NTC_MAKE_FLAGS} DESTDIR=${NTC} install || exit 1
 
 ######################################################
 # 2.0 INSTALL BINUTILS PASS 2
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 2.0 - Installing Binutils - Pass 2\n\n"
@@ -837,6 +845,7 @@ cp -v ld/ld-new ${NTC_TOOLS}/bin/
 
 ######################################################
 # 2.1 INSTALL GCC PASS 2
+#   = 7 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 2.1 - Installing GCC - Pass 2\n\n"
@@ -906,6 +915,7 @@ gcc -v dummy.c
 
 ######################################################
 # 3.0 INSTALL TCL
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.0 - Installing TCL Core\n\n"
@@ -931,6 +941,7 @@ ln -sv tclsh8.6 "${NTC_TOOLS}/bin/tclsh" || exit 1
 
 ######################################################
 # 3.1 INSTALL EXPECT
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.1 - Installing Expect\n\n"
@@ -959,6 +970,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.2 INSTALL DEJAGNU
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.2 - Installing DejaGNU\n\n"
@@ -980,6 +992,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.3 INSTALL CHECK
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.3 - Installing Check\n\n"
@@ -1002,6 +1015,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.4 INSTALL NCURSES
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.4 - Installing Ncurses\n\n"
@@ -1035,6 +1049,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.5 INSTALL BASH
+#   = 1 TKU
 ######################################################
 printf "\n\n\n\n\n... 3.5 - Installing Bash\n\n"
 
@@ -1058,6 +1073,7 @@ ln -sv bash "${NTC_TOOLS}/bin/sh" || exit 1
 
 ######################################################
 # 3.6 INSTALL BZIP2
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.6 - Installing Bzip2\n\n"
@@ -1075,6 +1091,7 @@ make "${NTC_MAKE_FLAGS}" PREFIX="${NTC_TOOLS}" install || exit 1
 
 ######################################################
 # 3.7 INSTALL COREUTILS
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.7 - Installing Coreutils\n\n"
@@ -1097,6 +1114,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.8 INSTALL DIFFUTILS
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.8 - Installing Diffutils\n\n"
@@ -1118,6 +1136,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.9 INSTALL ZLIB
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.9 - Installing Zlib\n\n"
@@ -1138,6 +1157,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.10 INSTALL FILE
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.10 - Installing File\n\n"
@@ -1159,6 +1179,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.11 INSTALL FINDUTILS
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.11 - Installing Findutils\n\n"
@@ -1180,6 +1201,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.12 INSTALL GAWK
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.12 - Installing Gawk\n\n"
@@ -1201,6 +1223,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.13 INSTALL GETTEXT
+#   = 3 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.13 - Installing Gettext\n\n"
@@ -1223,6 +1246,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.14 INSTALL GREP
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.14 - Installing Grep\n\n"
@@ -1244,6 +1268,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.15 INSTALL GZIP
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.15 - Installing Gzip\n\n"
@@ -1265,6 +1290,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.16 INSTALL M4
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.16 - Installing M4\n\n"
@@ -1286,6 +1312,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.17 INSTALL MAKE
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.17 - Installing Make\n\n"
@@ -1308,6 +1335,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.18 INSTALL PATCH
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.18 - Installing Patch\n\n"
@@ -1329,6 +1357,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.19 INSTALL SED
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.19 - Installing Sed\n\n"
@@ -1350,6 +1379,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.20 PERL
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.20 - Installing PERL\n\n"
@@ -1370,6 +1400,7 @@ cp -Rv lib/* ${NTC_TOOLS}/lib/perl${TOOL_PERL_MAJOR}/${TOOL_PERL_VERSION} || exi
 
 ######################################################
 # 3.21 TEXINFO
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.21 - Installing Texinfo\n\n"
@@ -1391,6 +1422,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 3.22 INSTALL TAR
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.22 - Installing Tar\n\n"
@@ -1412,6 +1444,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.23 INSTALL READLINE 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.23 - Installing Readline\n\n"
@@ -1439,6 +1472,7 @@ make "${NTC_MAKE_FLAGS}" SHLIB_LIBS=-lncursesw install || exit 1
 
 ######################################################
 # 3.24 INSTALL UTIL-LINUX
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.24 - Installing Util-linux\n\n"
@@ -1464,6 +1498,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 3.25 INSTALL XZ
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 3.25 - Installing XZ\n\n"
@@ -1485,6 +1520,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 4.0 CREATE DIRECTORIES
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.0 - Creating a few more directories\n\n"
@@ -1528,6 +1564,7 @@ export PATH=${NTC}/usr/local/bin:${NTC}/usr/local/sbin:${NTC}/usr/bin:${NTC}/usr
 
 ######################################################
 # 4.1 INSTALL LINUX HEADERS
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.1 - Installing Linux Kernel Headers\n\n"
@@ -1548,6 +1585,7 @@ cp -rv dest/include/* "${NTC}/usr/include" || exit 1
 
 ######################################################
 # 4.2 INSTALL MAN-PAGES 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.2 - Installing Man Pages\n\n"
@@ -1564,6 +1602,7 @@ make ${NTC_MAKE_FLAGS} DESTDIR=${NTC} install || exit 1
 
 ######################################################
 # 4.3.0 INSTALL GLIBC 
+#   = 4 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.3.0 - Installing Glibc\n\n"
@@ -1598,6 +1637,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 4.3.1 CONFIGURE GLIBC 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.3.1 - Configuring Glibc\n\n"
@@ -1674,6 +1714,7 @@ cp -v ${NTC}/usr/share/zoneinfo/${TZ} ${NTC}/etc/localtime
 
 ######################################################
 # 4.3.2 CONFIGURE DYNAMIC LOADER 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.3.2 - Configuring the Dynamic Loader\n\n"
@@ -1697,6 +1738,7 @@ EOF
 
 ######################################################
 # 4.3.3 Adjust the toolchain
+#   = 0 TKU
 ######################################################
 
 # some people use cc
@@ -1728,6 +1770,7 @@ rm -v dummy.c a.out dummy.log
 
 ######################################################
 # 4.4 INSTALL ZLIB
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.4 - Installing Zlib\n\n"
@@ -1751,6 +1794,7 @@ ln -sfv ../../lib/$(readlink ${NTC}/usr/lib/libz.so) ${NTC}/usr/lib/libz.so
 
 ######################################################
 # 4.5 INSTALL FILE
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.5 - Installing File\n\n"
@@ -1772,6 +1816,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 4.6 Binutils - Pass 3
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.6 - Installing Binutils - Pass 3\n\n"
@@ -1793,6 +1838,7 @@ make ${NTC_MAKE_FLAGS} tooldir=${NTC}/usr install || exit 1
 
 ######################################################
 # 4.7 GMP
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.7 - Installing GMP\n\n"
@@ -1821,6 +1867,7 @@ make ${NTC_MAKE_FLAGS} install-html || exit 1
 
 ######################################################
 # 4.8 MPFR
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.8 - Installing MPFR\n\n"
@@ -1849,6 +1896,7 @@ make ${NTC_MAKE_FLAGS} install-html || exit 1
 
 ######################################################
 # 4.9 MPC
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.9 - Installing MPC\n\n"
@@ -1876,6 +1924,7 @@ make ${NTC_MAKE_FLAGS} install-html || exit 1
 
 ######################################################
 # 4.10 GCC - PASS 3
+#   = 9 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 4.10 - Installing GCC - Pass 3\n\n"
@@ -1946,6 +1995,7 @@ mv -v ${NTC}/usr/lib/*gdb.py ${NTC}/usr/share/gdb/auto-load/usr/lib
 
 ######################################################
 # 5.0 OPENSSL
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.0 - Installing OpenSSL\n\n"
@@ -1970,6 +2020,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.1 PKGCONFIG 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.1 - Installing Pkg Config\n\n"
@@ -1996,6 +2047,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.2 NETTLE 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.2 - Installing Nettle\n\n"
@@ -2019,6 +2071,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.3 BISON 
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.3 - Installing Bison\n\n"
@@ -2046,6 +2099,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.4 EXPAT
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.4 - Installing Expat\n\n"
@@ -2075,6 +2129,7 @@ install -v -m644 doc/*.{html,png,css} ${NTC}/usr/share/doc/${TOOL_EXPAT}
 
 ######################################################
 # 5.5 UNBOUND 
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.5 - Installing Unbound\n\n"
@@ -2103,6 +2158,7 @@ unbound-anchor -a "${NTC}/etc/unbound/root.key"
 
 ######################################################
 # 5.6 GNUTLS 
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.6 - Installing Gnutls\n\n"
@@ -2131,6 +2187,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.7 WGET 
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.7 - Installing Wget\n\n"
@@ -2154,6 +2211,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.8 INSTALL NCURSES
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.8 - Installing Ncurses\n\n"
@@ -2202,6 +2260,7 @@ ln -sfv libncurses.so      ${NTC}/usr/lib/libcurses.so
 
 ######################################################
 # 5.9 INSTALL READLINE 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.9 - Installing Readline\n\n"
@@ -2229,6 +2288,7 @@ make "${NTC_MAKE_FLAGS}" SHLIB_LIBS=-lncursesw install || exit 1
 
 ######################################################
 # 5.10 Python - Pass 1 
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.10 - Installing Python - Pass 1\n\n"
@@ -2258,6 +2318,7 @@ ln -sv python3 ${NTC}/usr/bin/python
 
 ######################################################
 # 5.11 X11
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.11 - Installing X11\n\n"
@@ -2444,6 +2505,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.12 TCL 
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.12 - Installing TCL\n\n"
@@ -2467,6 +2529,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.13 TK
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.13 - Installing TK\n\n"
@@ -2491,6 +2554,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.14 INSTALL BZIP2
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.14 - Installing Bzip2\n\n"
@@ -2521,6 +2585,7 @@ ln -vs libbz2.so.${TOOL_BZIP2_MINOR_VERSION} ${NTC}/usr/lib/libbz2.so.1 || exit 
 
 ######################################################
 # 5.15 INSTALL GDBM
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.15 - Installing GDBM\n\n"
@@ -2545,6 +2610,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.16 INSTALL LIBFFI
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.16 - Installing LIBFFI\n\n"
@@ -2567,6 +2633,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.17 INSTALL EXPECT
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.17 - Installing Expect\n\n"
@@ -2595,6 +2662,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.18 INSTALL DEJAGNU
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.18 - Installing DejaGNU\n\n"
@@ -2616,6 +2684,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.19 INSTALL CHECK
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.19 - Installing Check\n\n"
@@ -2638,6 +2707,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.20 INSTALL BASH
+#   = 1 TKU
 ######################################################
 printf "\n\n\n\n\n... 5.20 - Installing Bash\n\n"
 
@@ -2661,6 +2731,7 @@ ln -sv bash "${NTC}/usr/bin/sh" || exit 1
 
 ######################################################
 # 5.21 INSTALL COREUTILS
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.21 - Installing Coreutils\n\n"
@@ -2683,6 +2754,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.22 INSTALL DIFFUTILS
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.22 - Installing Diffutils\n\n"
@@ -2704,6 +2776,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.23 INSTALL FINDUTILS
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.23 - Installing Findutils\n\n"
@@ -2725,6 +2798,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.24 INSTALL GAWK
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.24 - Installing Gawk\n\n"
@@ -2746,6 +2820,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.25 INSTALL GETTEXT
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.25 - Installing Gettext\n\n"
@@ -2767,6 +2842,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.26 INSTALL GREP
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.26 - Installing Grep\n\n"
@@ -2788,6 +2864,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.27 INSTALL GZIP
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.27 - Installing Gzip\n\n"
@@ -2809,6 +2886,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.28 INSTALL M4
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.28 - Installing M4\n\n"
@@ -2830,6 +2908,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.29 INSTALL MAKE
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.29 - Installing Make\n\n"
@@ -2852,6 +2931,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.30 INSTALL PATCH
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.30 - Installing Patch\n\n"
@@ -2873,6 +2953,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.31 INSTALL SED
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.31 - Installing Sed\n\n"
@@ -2894,6 +2975,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.32 PERL
+#   = 2 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.32 - Installing PERL\n\n"
@@ -2917,6 +2999,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.33 TEXINFO
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.33 - Installing Texinfo\n\n"
@@ -2938,6 +3021,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.34 INSTALL TAR
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.34 - Installing Tar\n\n"
@@ -2959,6 +3043,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.35 INSTALL READLINE 
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.35 - Installing Readline\n\n"
@@ -2986,6 +3071,7 @@ make "${NTC_MAKE_FLAGS}" SHLIB_LIBS=-lncursesw install || exit 1
 
 ######################################################
 # 5.36 INSTALL UTIL-LINUX
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.36 - Installing Util-linux\n\n"
@@ -3009,6 +3095,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.37 INSTALL XZ
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.37 - Installing XZ\n\n"
@@ -3030,6 +3117,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.38 INSTALL SQLITE
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.38 - Installing SQLITE\n\n"
@@ -3052,6 +3140,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.39 GSSAPI
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.39 - Installing GSSAPI\n\n"
@@ -3089,6 +3178,7 @@ make install || exit 1
 
 ######################################################
 # 5.39 Python - Pass 2
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.39 - Installing Python - Pass 2\n\n"
@@ -3122,6 +3212,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.40 Cmake
+#   = 5 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.40 - Installing Cmake\n\n"
@@ -3162,6 +3253,7 @@ make ${NTC_MAKE_FLAGS} install || exit 1
 
 ######################################################
 # 5.41 INSTALL WHICH
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.41 - Installing WHICH\n\n"
@@ -3183,6 +3275,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.42 INSTALL LIBEVENT
+#   = 1 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.42 - Installing LIBEVENT\n\n"
@@ -3205,6 +3298,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.43 INSTALL TMUX
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.43 - Installing TMUX\n\n"
@@ -3228,6 +3322,7 @@ make "${NTC_MAKE_FLAGS}" install || exit 1
 
 ######################################################
 # 5.44 INSTALL CF
+#   = 0 TKU
 ######################################################
 
 printf "\n\n\n\n\n... 5.44 - Installing CF\n\n"
