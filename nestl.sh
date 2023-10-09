@@ -9,6 +9,10 @@
 #  Make changes as you go if necessary. This is not a
 #  comprehensive guide like LFS. Merely a specific use case/example.
 #
+# TKUs (time keeping units):
+#  - 1 TKU might equal 2 minutes on my machine or 1 minute on yours
+#  - total time to build = (total TKUs) * (time to complete 1 TKU on your machine)
+#
 # TODO: I could probably avoid pass 2 of binutils/gcc.
 # TODO: tzdata hard coded
 # TODO: version 1.1 tool list is a dummy placeholder
@@ -49,7 +53,8 @@ printf "\tLocation   : ${NTC}\n"
 printf "\tTemp tools : ${NTC_TOOLS}\n"
 printf "\tTemp name  : ${NTC_NAME}\n"
 printf "\tMake flags : ${NTC_MAKE_FLAGS}\n"
-printf "\tToolset    : v${NTC_VERSION}\n\n"
+printf "\tToolset    : v${NTC_VERSION}\n"
+printf "\tETA        : "$(sed -n -e 's/.* \(.*\) TKU.*/\1/p' "$0" | awk '{s+=$1} END {print s}')" TKUs\n\n"
 
 # give the user a chance to spot a mistake without going all interactive
 sleep 5
